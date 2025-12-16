@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>京·华 - 系列展示</title>
+    <!-- 字体优化：display=swap -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
@@ -14,6 +15,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
+
+    <!-- 新增：Loading 遮罩层 -->
+    <div id="pageLoader" class="page-loader">
+        <div class="loader-content">
+            <div class="loader-text">京 · 华</div>
+            <div class="loader-spinner"></div>
+            <div class="loader-tips">正在铺陈纸墨...</div>
+        </div>
+    </div>
 
     <header>
         <div class="title-container">
@@ -64,7 +74,7 @@
                         <!-- 标题 -->
                         <div class="back-title">京 · 华</div>
 
-                        <!-- 【核心修复】独立的视觉邮票框 (绝对定位，不会被切) -->
+                        <!-- 独立的视觉邮票框 -->
                         <div class="stamp-box-visual"></div>
 
                         <!-- 书写区 -->
@@ -74,7 +84,7 @@
                             
                             <!-- 可编辑文本区 -->
                             <div id="messageInput" class="message-input-div" contenteditable="true">
-                                <!-- 逻辑占位块 (透明，只负责挤开文字) -->
+                                <!-- 逻辑占位块 -->
                                 <div id="stampSpacer" class="stamp-spacer" contenteditable="false"></div>
                             </div>
                         </div>

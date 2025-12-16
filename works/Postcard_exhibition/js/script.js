@@ -21,9 +21,10 @@ const sizeSelect = getEl('sizeSelect');
 const indentCheck = getEl('indentCheck');
 const stampSpacer = getEl('stampSpacer');
 
-// --- 初始化 ---
+// --- 初始化 (含Loading逻辑) ---
 async function init() {
     try {
+        // 1. 获取 JSON 数据
         const response = await fetch('data/postcards.json');
         if (!response.ok) throw new Error('data/postcards.json 加载失败');
         postcards = await response.json();
@@ -37,9 +38,28 @@ async function init() {
         
         if(sizeSelect) updateFontSize(sizeSelect.value);
 
+        // 2. 预加载大背景图 (WebP)
+        const bgImg = new Image();
+        bgImg.src = "images/background.webp";
+        
+        // 3. 图片加载完 或 出错 或 超时 -> 移除Loading
+        bgImg.onload = removeLoader;
+        bgImg.onerror = removeLoader;
+        setTimeout(removeLoader, 3000); // 3秒兜底
+
     } catch (error) {
         console.error("初始化错误:", error);
         if(infoTitle) infoTitle.innerText = "数据加载失败";
+        removeLoader(); // 出错也要进页面
+    }
+}
+
+// 移除Loading遮罩
+function removeLoader() {
+    const loader = getEl('pageLoader');
+    if (loader && !loader.classList.contains('hidden')) {
+        loader.classList.add('hidden');
+        setTimeout(() => { loader.style.display = 'none'; }, 500);
     }
 }
 
@@ -66,7 +86,6 @@ function bindEvents() {
         else messageInput.classList.remove('indented');
     };
 
-    // 强制占位块位置
     if(messageInput) {
         messageInput.addEventListener('input', function() {
             if (!this.contains(stampSpacer) || this.firstChild !== stampSpacer) {
@@ -179,7 +198,6 @@ function downloadImages() {
     // 2. 截图背面
     const originalBack = getEl('cardBack');
     
-    // 创建临时容器
     const tempContainer = document.createElement('div');
     tempContainer.style.position = 'absolute';
     tempContainer.style.top = '-9999px';
@@ -188,7 +206,6 @@ function downloadImages() {
     tempContainer.style.height = '666px'; 
     document.body.appendChild(tempContainer);
 
-    // 克隆
     const clonedBack = originalBack.cloneNode(true);
     clonedBack.style.transform = 'none';
     clonedBack.style.width = '100%';
@@ -196,11 +213,9 @@ function downloadImages() {
     clonedBack.style.boxShadow = 'none';
     clonedBack.style.margin = '0';
     
-    // --- 关键修复：强制设置行高变量 ---
-    // 获取当前计算后的行高值
+    // --- 样式注入，确保横线可见 ---
     const computedStyle = getComputedStyle(document.documentElement);
     const currentLineHeight = computedStyle.getPropertyValue('--line-height');
-    // 强制写入到克隆节点的 style 属性中
     clonedBack.style.setProperty('--line-height', currentLineHeight);
 
     tempContainer.appendChild(clonedBack);
